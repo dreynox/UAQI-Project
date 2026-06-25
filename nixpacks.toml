@@ -1,0 +1,4 @@
+# Nixpacks config — only used if Railway falls back to Nixpacks builder.
+# Forces Nixpacks to use the exact start command we want.
+[start]
+cmd = "/entrypoint.sh"
