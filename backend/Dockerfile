@@ -28,4 +28,5 @@ EXPOSE 8000
 
 # Seed on startup is env-controlled (default off in container for fast cold start;
 # re-run scripts/init_db.py if you want to reseed).
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use Railway's $PORT if provided, otherwise default to 8000.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
