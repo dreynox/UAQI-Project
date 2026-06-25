@@ -10,6 +10,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // GitHub Pages serves the site at https://<user>.github.io/<repo>/
+  base: process.env.VITE_BASE_PATH || "/UAQI-Project/",
   server: {
     port: 5173,
     host: true,
@@ -19,5 +21,11 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+  },
+  build: {
+    // Put built assets in dist/ at the repo root, ready for GitHub Pages
+    outDir: "dist",
+    sourcemap: false,
+    chunkSizeWarningLimit: 1500,
   },
 });
