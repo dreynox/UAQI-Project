@@ -1,4 +1,9 @@
-# Urban Air Quality Intelligence — Backend
+# Top-level Dockerfile for Railway.
+# Railway looks for ./Dockerfile at the repo root. This file:
+#  1. Copies the backend/ contents into /app
+#  2. Installs deps and runs uvicorn from there
+# This avoids needing the "Root Directory" dashboard setting.
+
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -14,11 +19,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgeos-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+# Copy the backend folder's contents (the build context becomes /app).
+COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app ./app
-COPY scripts ./scripts
+COPY backend/app ./app
+COPY backend/scripts ./scripts
 
 ENV APP_ENV=production \
     APP_HOST=0.0.0.0 \
@@ -26,7 +32,5 @@ ENV APP_ENV=production \
 
 EXPOSE 8000
 
-# Seed on startup is env-controlled (default off in container for fast cold start;
-# re-run scripts/init_db.py if you want to reseed).
 # Use Railway's $PORT if provided, otherwise default to 8000.
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
