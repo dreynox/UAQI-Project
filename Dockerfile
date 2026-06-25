@@ -28,9 +28,16 @@ COPY backend/scripts ./scripts
 
 ENV APP_ENV=production \
     APP_HOST=0.0.0.0 \
-    APP_PORT=8000
+    APP_PORT=8080
 
-EXPOSE 8000
+EXPOSE 8080
 
-# Use Railway's $PORT if provided, otherwise default to 8000.
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Railway injects $PORT at runtime. We use an entrypoint shell script
+# so $PORT is expanded by the shell (the JSON-array CMD form does NOT
+# expand env vars — they're passed as literals, which is why $PORT was
+# being treated as the string "$PORT" instead of the port number).
+RUN printf '#!/bin/sh\nexec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8080}"\n' \
+    > /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
